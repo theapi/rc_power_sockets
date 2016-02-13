@@ -23,13 +23,13 @@ void loop() {
   mySwitch.switchOn(1, 1);
 
   // Wait a bit
-  delay(2000);
+  delay(5000);
   
   // Switch off
   mySwitch.switchOff(1, 1);
   
   // Wait a bit
-  delay(2000);
+  delay(5000);
   
 }
 
