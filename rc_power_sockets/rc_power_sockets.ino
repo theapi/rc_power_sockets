@@ -1,59 +1,55 @@
 #include <RCSwitch.h>
 
 #define PIN_RADIO_OUT 10
-#define PIN_RADIO_IN  8
 #define PIN_MOTION_IN 9
+
+byte count = 0;
+byte num_transmissions = 10; // How many times to send the command.
+byte state = 0; // 0 = off, 1 = on
 
 RCSwitch mySwitch = RCSwitch();
 
+
 void setup() {
-  
-  Serial.begin(115200);
-  
+
   pinMode(PIN_MOTION_IN, INPUT);
 
   // Transmitter is connected to Arduino Pin
   mySwitch.enableTransmit(PIN_RADIO_OUT);
-    
-    
+
 }
 
 void loop() {
 
   if (digitalRead(PIN_MOTION_IN)) {
-    mySwitch.switchOn(1, 1);
-    Serial.println("ON");
+    if (state == 0) {
+      // Just started turning on so reset the counter.
+      count = 0;
+    }
     
-    // Wait a bit
-    delay(1000);
-    
+    state = 1;
+    if (count <= num_transmissions) {
+      mySwitch.switchOn(1, 1);
+      count++;
+      // Allow time for transmission
+      delay(500);
+    }
+
   } else {
-    mySwitch.switchOff(1, 1);
+    if (state == 1) {
+      // Just started turning off so reset the counter.
+      count = 0;
+    }
     
-    Serial.println("OFF");
-    
-    // Wait a bit
-    delay(1000);
+    state = 0;
+    if (count <= num_transmissions) {
+      mySwitch.switchOff(1, 1);
+      count++;
+      // Allow time for transmission
+      delay(500);
+    }
     
   }
-  
-  /*
-  // Switch on:
-  // The first parameter represents the setting of the first rotary switch. 
-  // In this example it's switched to "1" or "A" or "I". 
-  // 
-  // The second parameter represents the setting of the second rotary switch. 
-  // In this example it's switched to "4" or "D" or "IV". 
-  mySwitch.switchOn(1, 1);
 
-  // Wait a bit
-  delay(2000);
-  
-  // Switch off
-  mySwitch.switchOff(1, 1);
-  
-  // Wait a bit
-  delay(2000);
-  */
 }
 
