@@ -2,6 +2,7 @@
 
 #define PIN_RADIO_OUT 10
 #define PIN_MOTION_IN 9
+#define PIN_POWER 8
 
 byte count = 0;
 byte num_transmissions = 10; // How many times to send the command.
@@ -13,6 +14,10 @@ RCSwitch mySwitch = RCSwitch();
 void setup() {
 
   pinMode(PIN_MOTION_IN, INPUT);
+  pinMode(PIN_POWER, OUTPUT);
+  
+  // Keep the power on.
+  digitalWrite(PIN_POWER, HIGH);
 
   // Transmitter is connected to Arduino Pin
   mySwitch.enableTransmit(PIN_RADIO_OUT);
@@ -47,6 +52,9 @@ void loop() {
       count++;
       // Allow time for transmission
       delay(500);
+    } else {
+      // power down 
+      digitalWrite(PIN_POWER, LOW);
     }
     
   }
