@@ -1,8 +1,8 @@
 #include <RCSwitch.h>
 
-#define PIN_RADIO_OUT 10
-#define PIN_MOTION_IN 9
-#define PIN_POWER 8
+#define PIN_RADIO_OUT 11
+#define PIN_MOTION_IN 1
+#define PIN_POWER 7
 
 byte count = 0;
 byte num_transmissions = 10; // How many times to send the command.
