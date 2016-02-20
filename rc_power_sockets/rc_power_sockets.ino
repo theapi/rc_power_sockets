@@ -18,12 +18,16 @@ byte state = 0; // 0 = off, 1 = on
 RCSwitch mySwitch = RCSwitch();
 
 void ISR_motion() {
-  // Just wake  up!
+  // Wake  up!
+  // cancel sleep as a precaution
+  sleep_disable();
+  detachInterrupt(0);
 }
 
 void setup() {
 
   // Turn off everything but timers
+  ADCSRA = 0;  // disable ADC
   power_all_disable();
   power_timer0_enable();
   power_timer1_enable();
@@ -35,19 +39,24 @@ void setup() {
   
   // Keep the power on.
   digitalWrite(PIN_POWER, HIGH);
+  
+  digitalWrite(PIN_DEBUG, HIGH);
 
   // Transmitter is connected to Arduino Pin
   mySwitch.enableTransmit(PIN_RADIO_OUT);
   
-  attachInterrupt(PIN_MOTION_IN, ISR_motion, CHANGE);
+  
+
 
 }
 
 void loop() {
+  
+  
 
   if (digitalRead(PIN_MOTION_IN)) {
     
-    digitalWrite(PIN_DEBUG, HIGH);
+    
     
     if (state == 0) {
       // Just started turning on so reset the counter.
@@ -67,7 +76,7 @@ void loop() {
 
   } else {
     
-    digitalWrite(PIN_DEBUG, LOW);
+    
     
     if (state == 1) {
       // Just started turning off so reset the counter.
@@ -91,26 +100,34 @@ void loop() {
 
 void goToSleep()
 {
-  return; // disabled for now
-  cli();
+  digitalWrite(PIN_DEBUG, LOW);
 
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   power_all_disable();
 
-  sleep_enable();
-  sei();
-  
-  // turn off brown-out enable in software
-  MCUCR = bit (BODS) | bit (BODSE);  // turn on brown-out enable select
-  MCUCR = bit (BODS);        // this must be done within 4 clock cycles of above
-  sleep_cpu();              // sleep within 3 clock cycles of above
-                      
-  sleep_disable();  
   MCUSR = 0; // clear the reset register 
+  noInterrupts();           // timed sequence follows
+  attachInterrupt(0, ISR_motion, CHANGE);
+  sleep_enable();
+                      
+  // turn off brown-out enable in software
+  MCUCR = bit (BODS) | bit (BODSE);
+  MCUCR = bit (BODS); 
+  interrupts();             // guarantees next instruction executed
+  sleep_cpu();  
+  
+  // cancel sleep as a precaution
+  sleep_disable();  
+  
+  
   
   power_timer0_enable();
   power_timer1_enable();
   power_timer2_enable();
+  
 
+  //power_all_enable();
+
+  digitalWrite(PIN_DEBUG, HIGH);
 }
 
