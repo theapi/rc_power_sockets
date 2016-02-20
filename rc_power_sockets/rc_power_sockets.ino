@@ -1,11 +1,13 @@
+
+
 #include <RCSwitch.h>
 #include <avr/sleep.h>    // Sleep Modes
 #include <avr/power.h>    // Power management
 
 
 #define PIN_MOTION_IN 2
-#define PIN_POWER 7
-#define PIN_RADIO_OUT 6
+#define PIN_POWER 6
+#define PIN_RADIO_OUT 7
 #define PIN_DEBUG 3
 
 byte count = 0;
@@ -53,13 +55,12 @@ void loop() {
     }
     
     state = 1;
-    if (count <= num_transmissions) {
+    if (count < num_transmissions) {
       mySwitch.switchOn(1, 1);
       count++;
       // Allow time for transmission
       delay(500);
     } else {
-      count = 0;
       // Go back to sleep until motion change interrupt.
       goToSleep();
     }
@@ -74,13 +75,12 @@ void loop() {
     }
     
     state = 0;
-    if (count <= num_transmissions) {
+    if (count < num_transmissions) {
       mySwitch.switchOff(1, 1);
       count++;
       // Allow time for transmission
       delay(500);
     } else {
-      count = 0;
       // power down 
       digitalWrite(PIN_POWER, LOW);
     }
@@ -91,7 +91,7 @@ void loop() {
 
 void goToSleep()
 {
-  
+  return; // disabled for now
   cli();
 
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);

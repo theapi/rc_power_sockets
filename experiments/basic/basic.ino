@@ -1,15 +1,19 @@
 #include <RCSwitch.h>
 
+#define PIN_POWER 6
+
 RCSwitch mySwitch = RCSwitch();
 
 void setup() {
 
-  // Transmitter is connected to Arduino Pin #10  
-  mySwitch.enableTransmit(10);
+  // Transmitter is connected to Arduino Pin
+  mySwitch.enableTransmit(7);
   
   // Optional set pulse length.
   // mySwitch.setPulseLength(320);
   
+  pinMode(PIN_POWER, OUTPUT);
+  digitalWrite(PIN_POWER, HIGH);
 }
 
 void loop() {
