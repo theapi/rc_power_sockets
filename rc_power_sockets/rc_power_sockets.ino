@@ -34,11 +34,17 @@ ISR(WDT_vect) {
   }
 }
 
+/**
+ * Motion change detected.
+ */
 void ISR_motion() {
-  // Wake  up!
-  // cancel sleep as a precaution
-  sleep_disable();
-  detachInterrupt(0);
+  if (wd_isr != WD_DO_STUFF) {
+    // Ignore this interrupt & wait for the ON timer to finish.
+    goToSleep();
+  } else {
+    sleep_disable();
+    detachInterrupt(0);
+  }
 }
 
 void setup() {
@@ -71,7 +77,7 @@ void loop() {
   wdt_reset();
   
   if (digitalRead(PIN_MOTION_IN)) {
-      
+    wd_isr = WD_DO_STUFF; // Reset ON timer.
     if (state == 0) {
       // Just started turning on so reset the counter.
       count = 0;
@@ -96,6 +102,7 @@ void loop() {
     }
     
     state = 0;
+
     if (count < num_transmissions) {
       mySwitch.switchOff(1, 1);
       count++;
@@ -103,7 +110,7 @@ void loop() {
       delay(500);
     } else {
       // power down 
-      digitalWrite(PIN_POWER, LOW);
+      digitalWrite(PIN_POWER, LOW);      
     }
     
   }
