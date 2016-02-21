@@ -8,7 +8,7 @@
 #define PIN_MOTION_IN 2
 #define PIN_POWER 6
 #define PIN_RADIO_OUT 7
-#define PIN_DEBUG 3
+#define PIN_DEBUG 1
 
 byte count = 0;
 byte num_transmissions = 10; // How many times to send the command.
