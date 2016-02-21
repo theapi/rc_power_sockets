@@ -1,21 +1,38 @@
 
 
+// RC Switch library form https://github.com/sui77/rc-switch
 #include <RCSwitch.h>
 #include <avr/sleep.h>    // Sleep Modes
 #include <avr/power.h>    // Power management
-
+#include <avr/wdt.h>      // Watchdog
 
 #define PIN_MOTION_IN 2
 #define PIN_POWER 6
 #define PIN_RADIO_OUT 7
 #define PIN_DEBUG 1
 
+#define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
+
 byte count = 0;
 byte num_transmissions = 10; // How many times to send the command.
 byte state = 0; // 0 = off, 1 = on
 
+volatile byte wd_isr = WD_DO_STUFF;
+
 
 RCSwitch mySwitch = RCSwitch();
+
+ISR(WDT_vect) {
+  // Wake up by watchdog
+  if (wd_isr == 0) {
+      wd_isr = WD_DO_STUFF;
+      // Slept for long enough, now do stuff.
+  } else {
+      --wd_isr; 
+      // Go back to sleep.
+      goToSleep();
+  }
+}
 
 void ISR_motion() {
   // Wake  up!
@@ -42,22 +59,19 @@ void setup() {
   
   digitalWrite(PIN_DEBUG, HIGH);
 
+  watchdog_setup();
+
   // Transmitter is connected to Arduino Pin
   mySwitch.enableTransmit(PIN_RADIO_OUT);
   
-  
-
-
 }
 
 void loop() {
+  // Tell watchdog all is ok.
+  wdt_reset();
   
-  
-
   if (digitalRead(PIN_MOTION_IN)) {
-    
-    
-    
+      
     if (state == 0) {
       // Just started turning on so reset the counter.
       count = 0;
@@ -75,9 +89,7 @@ void loop() {
     }
 
   } else {
-    
-    
-    
+      
     if (state == 1) {
       // Just started turning off so reset the counter.
       count = 0;
@@ -98,8 +110,7 @@ void loop() {
 
 }
 
-void goToSleep()
-{
+void goToSleep() {
   digitalWrite(PIN_DEBUG, LOW);
 
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
@@ -129,5 +140,20 @@ void goToSleep()
   //power_all_enable();
 
   digitalWrite(PIN_DEBUG, HIGH);
+}
+
+/**
+ * Watchdog to sleep for maximum time (8 seconds).
+ */
+void watchdog_setup() {
+  // Clear any previous watchdog interupt
+  MCUSR = 0;
+    
+  // allow changes, disable reset
+  WDTCSR = bit (WDCE) | bit (WDE);
+  // set interrupt mode and an interval 
+  WDTCSR = bit (WDIE) | bit (WDP3) | bit (WDP0);    // set WDIE, and 8 seconds delay
+  
+  wdt_reset();
 }
 
