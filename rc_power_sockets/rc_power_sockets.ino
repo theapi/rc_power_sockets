@@ -13,6 +13,7 @@
 
 #define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
 
+
 byte count = 0;
 byte num_transmissions = 10; // How many times to send the command.
 byte state = 0; // 0 = off, 1 = on
@@ -37,14 +38,17 @@ ISR(WDT_vect) {
 /**
  * Motion change detected.
  */
-void ISR_motion() {
-  if (wd_isr != WD_DO_STUFF) {
+void ISR_motion() { 
+
+  /*
+  if (do_stuff == 0) {
     // Ignore this interrupt & wait for the ON timer to finish.
     goToSleep();
   } else {
     sleep_disable();
     detachInterrupt(0);
   }
+  */
 }
 
 void setup() {
@@ -77,7 +81,7 @@ void loop() {
   wdt_reset();
   
   if (digitalRead(PIN_MOTION_IN)) {
-    wd_isr = WD_DO_STUFF; // Reset ON timer.
+    
     if (state == 0) {
       // Just started turning on so reset the counter.
       count = 0;
@@ -125,7 +129,7 @@ void goToSleep() {
 
   MCUSR = 0; // clear the reset register 
   noInterrupts();           // timed sequence follows
-  attachInterrupt(0, ISR_motion, CHANGE);
+  //attachInterrupt(0, ISR_motion, CHANGE);
   sleep_enable();
                       
   // turn off brown-out enable in software
@@ -136,9 +140,7 @@ void goToSleep() {
   
   // cancel sleep as a precaution
   sleep_disable();  
-  
-  
-  
+
   power_timer0_enable();
   power_timer1_enable();
   power_timer2_enable();
