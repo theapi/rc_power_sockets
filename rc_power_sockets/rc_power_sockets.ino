@@ -15,7 +15,7 @@
 
 
 byte count = 0;
-byte num_transmissions = 10; // How many times to send the command.
+byte num_transmissions = 5; // How many times to send the command.
 byte state = 0; // 0 = off, 1 = on
 
 volatile byte wd_isr = WD_DO_STUFF;
@@ -40,7 +40,9 @@ ISR(WDT_vect) {
  */
 void ISR_motion() { 
   // Reset the timer.
-  wd_isr = WD_DO_STUFF;
+  wd_isr = WD_DO_STUFF - 1;
+  // Go back to sleep.
+  goToSleep();
 }
 
 void setup() {
@@ -84,7 +86,7 @@ void loop() {
       mySwitch.switchOn(1, 1);
       count++;
       // Allow time for transmission
-      delay(500);
+      delay(250);
     } else {
       // Go back to sleep until motion change interrupt.
       goToSleep();
@@ -103,7 +105,7 @@ void loop() {
       mySwitch.switchOff(1, 1);
       count++;
       // Allow time for transmission
-      delay(500);
+      delay(250);
     } else {
       // power down 
       digitalWrite(PIN_POWER, LOW);      
