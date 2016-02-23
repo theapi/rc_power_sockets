@@ -36,19 +36,11 @@ ISR(WDT_vect) {
 }
 
 /**
- * Motion change detected.
+ * Wake up by motion detected.
  */
 void ISR_motion() { 
-
-  /*
-  if (do_stuff == 0) {
-    // Ignore this interrupt & wait for the ON timer to finish.
-    goToSleep();
-  } else {
-    sleep_disable();
-    detachInterrupt(0);
-  }
-  */
+  // Reset the timer.
+  wd_isr = WD_DO_STUFF;
 }
 
 void setup() {
@@ -129,7 +121,7 @@ void goToSleep() {
 
   MCUSR = 0; // clear the reset register 
   noInterrupts();           // timed sequence follows
-  //attachInterrupt(0, ISR_motion, CHANGE);
+  attachInterrupt(0, ISR_motion, RISING);
   sleep_enable();
                       
   // turn off brown-out enable in software
