@@ -11,8 +11,8 @@
 #define PIN_RADIO_OUT 7
 #define PIN_DEBUG 1
 
-#define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
-
+//#define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
+#define WD_DO_STUFF 200 // (10 = 90s not the 80 the maths say)
 
 byte count = 0;
 byte num_transmissions = 5; // How many times to send the command.
@@ -25,6 +25,8 @@ RCSwitch mySwitch = RCSwitch();
 
 ISR(WDT_vect) {
   // Wake up by watchdog
+  extendedSleep();
+  /*
   if (wd_isr == 0) {
       wd_isr = WD_DO_STUFF;
       // Slept for long enough, now do stuff.
@@ -33,6 +35,7 @@ ISR(WDT_vect) {
       // Go back to sleep.
       goToSleep();
   }
+  */
 }
 
 /**
@@ -40,9 +43,21 @@ ISR(WDT_vect) {
  */
 void ISR_motion() { 
   // Reset the timer.
-  wd_isr = WD_DO_STUFF - 1;
+  wd_isr = WD_DO_STUFF;
   // Go back to sleep.
-  goToSleep();
+  //goToSleep
+  extendedSleep();
+}
+
+void extendedSleep() {
+  if (wd_isr == 0) {
+      wd_isr = WD_DO_STUFF;
+      // Slept for long enough, now do stuff.
+  } else {
+      --wd_isr; 
+      // Go back to sleep.
+      goToSleep();
+  }
 }
 
 void setup() {
@@ -123,7 +138,7 @@ void goToSleep() {
 
   MCUSR = 0; // clear the reset register 
   noInterrupts();           // timed sequence follows
-  attachInterrupt(0, ISR_motion, RISING);
+  attachInterrupt(0, ISR_motion, FALLING);
   sleep_enable();
                       
   // turn off brown-out enable in software
