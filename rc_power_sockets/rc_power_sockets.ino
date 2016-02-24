@@ -12,13 +12,13 @@
 #define PIN_DEBUG 1
 
 //#define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
-#define WD_DO_STUFF 200 // (10 = 90s not the 80 the maths say)
+const int WD_DO_STUFF = 400; // (10 = 90s not the 80 the maths say, 200 = 16min)
 
 byte count = 0;
 byte num_transmissions = 5; // How many times to send the command.
 byte state = 0; // 0 = off, 1 = on
 
-volatile byte wd_isr = WD_DO_STUFF;
+volatile int wd_isr = WD_DO_STUFF;
 
 
 RCSwitch mySwitch = RCSwitch();
