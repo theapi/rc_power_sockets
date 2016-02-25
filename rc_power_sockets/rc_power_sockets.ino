@@ -1,5 +1,4 @@
 
-
 // RC Switch library form https://github.com/sui77/rc-switch
 #include <RCSwitch.h>
 #include <avr/sleep.h>    // Sleep Modes
@@ -12,62 +11,39 @@
 #define PIN_DEBUG 1
 
 //#define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
-const int WD_DO_STUFF = 400; // (10 = 90s not the 80 the maths say, 200 = 16min)
+const int WD_DO_STUFF = 8; 
 
 byte count = 0;
 byte num_transmissions = 5; // How many times to send the command.
 byte state = 0; // 0 = off, 1 = on
 
-volatile int wd_isr = WD_DO_STUFF;
+volatile int wd_isr = WD_DO_STUFF; // Start in do stuff mode.
 
 
 RCSwitch mySwitch = RCSwitch();
 
+/**
+ * Wake up by watchdog
+ */
 ISR(WDT_vect) {
-  // Wake up by watchdog
-  extendedSleep();
-  /*
-  if (wd_isr == 0) {
-      wd_isr = WD_DO_STUFF;
-      // Slept for long enough, now do stuff.
-  } else {
-      --wd_isr; 
-      // Go back to sleep.
-      goToSleep();
-  }
-  */
+  ++wd_isr;
 }
 
 /**
- * Wake up by motion detected.
+ * Wake up by motion stopped.
  */
-void ISR_motion() { 
-  // Reset the timer.
-  wd_isr = WD_DO_STUFF;
-  // Go back to sleep.
-  //goToSleep
-  extendedSleep();
-}
-
-void extendedSleep() {
-  if (wd_isr == 0) {
-      wd_isr = WD_DO_STUFF;
-      // Slept for long enough, now do stuff.
-  } else {
-      --wd_isr; 
-      // Go back to sleep.
-      goToSleep();
-  }
+void isr_motion() { 
+  wd_isr = 0; // Reset the timer
 }
 
 void setup() {
-
+  
   // Turn off everything but timers
   ADCSRA = 0;  // disable ADC
   power_all_disable();
   power_timer0_enable();
   power_timer1_enable();
-  power_timer2_enable();
+  //power_timer2_enable();
   
   pinMode(PIN_MOTION_IN, INPUT);
   pinMode(PIN_POWER, OUTPUT);
@@ -80,7 +56,7 @@ void setup() {
 
   watchdog_setup();
 
-  // Transmitter is connected to Arduino Pin
+  // Transmitter enable
   mySwitch.enableTransmit(PIN_RADIO_OUT);
   
 }
@@ -89,43 +65,38 @@ void loop() {
   // Tell watchdog all is ok.
   wdt_reset();
   
-  if (digitalRead(PIN_MOTION_IN)) {
-    
-    if (state == 0) {
-      // Just started turning on so reset the counter.
-      count = 0;
-    }
-    
-    state = 1;
-    if (count < num_transmissions) {
-      mySwitch.switchOn(1, 1);
-      count++;
-      // Allow time for transmission
-      delay(250);
-    } else {
-      // Go back to sleep until motion change interrupt.
-      goToSleep();
-    }
-
+  if (wd_isr < WD_DO_STUFF) {
+    // Carry on sleeping.
+    goToSleep();
   } else {
-      
-    if (state == 1) {
-      // Just started turning off so reset the counter.
-      count = 0;
-    }
-    
-    state = 0;
-
-    if (count < num_transmissions) {
-      mySwitch.switchOff(1, 1);
-      count++;
-      // Allow time for transmission
-      delay(250);
+    if (digitalRead(PIN_MOTION_IN)) {
+      // Movement happening.
+      if (state == 0) {
+        // Rising edge of motion sensor.
+        state = 1;
+        wd_isr = 0; // Reset the timer
+        for (int i = 0; i < num_transmissions; i++) {
+          mySwitch.switchOn(1, 1);
+          // Allow time for transmission
+          delay(250);
+        }
+      }
     } else {
+      // No movement.
+      if (state == 1) {
+        // Falling edge of motion sensor.
+        state = 0;
+        for (int i = 0; i < num_transmissions; i++) {
+          mySwitch.switchOff(1, 1);
+          // Allow time for transmission
+          delay(250);
+        }
+      }
       // power down 
-      digitalWrite(PIN_POWER, LOW);      
+      digitalWrite(PIN_POWER, LOW);
     }
     
+    goToSleep();
   }
 
 }
@@ -138,7 +109,7 @@ void goToSleep() {
 
   MCUSR = 0; // clear the reset register 
   noInterrupts();           // timed sequence follows
-  attachInterrupt(0, ISR_motion, FALLING);
+  attachInterrupt(0, isr_motion, FALLING);
   sleep_enable();
                       
   // turn off brown-out enable in software
@@ -152,7 +123,7 @@ void goToSleep() {
 
   power_timer0_enable();
   power_timer1_enable();
-  power_timer2_enable();
+  //power_timer2_enable();
   
 
   //power_all_enable();
