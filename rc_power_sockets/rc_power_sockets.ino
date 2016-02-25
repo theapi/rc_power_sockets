@@ -11,7 +11,7 @@
 #define PIN_DEBUG 1
 
 //#define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
-const int WD_DO_STUFF = 8; 
+const int WD_DO_STUFF = 225; 
 
 byte count = 0;
 byte num_transmissions = 5; // How many times to send the command.
