@@ -1,4 +1,8 @@
 
+#if defined( __AVR_ATtiny85__ )
+  #define __AVR_ATtinyX5__ 1 // For RCSwitch
+#endif
+
 // RC Switch library form https://github.com/sui77/rc-switch
 #include <RCSwitch.h>
 #include <avr/sleep.h>    // Sleep Modes
@@ -137,12 +141,19 @@ void goToSleep() {
 void watchdog_setup() {
   // Clear any previous watchdog interupt
   MCUSR = 0;
-    
-  // allow changes, disable reset
-  WDTCSR = bit (WDCE) | bit (WDE);
-  // set interrupt mode and an interval 
-  WDTCSR = bit (WDIE) | bit (WDP3) | bit (WDP0);    // set WDIE, and 8 seconds delay
-  
+
+  #if defined( __AVR_ATtiny85__ )
+    // allow changes, disable reset
+    WDTCR = bit (WDCE) | bit (WDE);
+    // set interrupt mode and an interval 
+    WDTCR = bit (WDIE) | bit (WDP3) | bit (WDP0);    // set WDIE, and 8 seconds delay
+  #else
+    // allow changes, disable reset
+    WDTCSR = bit (WDCE) | bit (WDE);
+    // set interrupt mode and an interval 
+    WDTCSR = bit (WDIE) | bit (WDP3) | bit (WDP0);    // set WDIE, and 8 seconds delay
+  #endif
+
   wdt_reset();
 }
 
