@@ -10,9 +10,16 @@
 #include <avr/wdt.h>      // Watchdog
 
 #define PIN_MOTION_IN 2
-#define PIN_POWER 6
-#define PIN_RADIO_OUT 7
-#define PIN_DEBUG 1
+
+#if defined( __AVR_ATtiny85__ )
+  #define PIN_POWER 1
+  #define PIN_RADIO_OUT 4
+  #define PIN_DEBUG 0
+#else
+  #define PIN_POWER 6
+  #define PIN_RADIO_OUT 7
+  #define PIN_DEBUG 1
+#endif
 
 //#define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
 const int WD_DO_STUFF = 225; 
