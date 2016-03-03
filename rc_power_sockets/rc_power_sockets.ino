@@ -86,7 +86,7 @@ void loop() {
         // Rising edge of motion sensor.
         state = 1;
         wd_isr = 0; // Reset the timer
-        for (int i = 0; i < num_transmissions; i++) {
+        for (int i = 0; i <= num_transmissions; i++) {
           mySwitch.switchOn(1, 1);
           // Allow time for transmission
           delay(250);
@@ -97,7 +97,7 @@ void loop() {
       if (state == 1) {
         // Falling edge of motion sensor.
         state = 0;
-        for (int i = 0; i < num_transmissions; i++) {
+        for (int i = 0; i <= num_transmissions; i++) {
           mySwitch.switchOff(1, 1);
           // Allow time for transmission
           delay(250);
@@ -123,9 +123,14 @@ void goToSleep() {
   attachInterrupt(0, isr_motion, FALLING);
   sleep_enable();
                       
-  // turn off brown-out enable in software
-  MCUCR = bit (BODS) | bit (BODSE);
-  MCUCR = bit (BODS); 
+  #if defined( __AVR_ATtiny85__ )
+    // no brown out
+  #else
+    // turn off brown-out enable in software
+    MCUCR = bit (BODS) | bit (BODSE);
+    MCUCR = bit (BODS); 
+  #endif
+  
   interrupts();             // guarantees next instruction executed
   sleep_cpu();  
   
