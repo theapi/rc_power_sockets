@@ -1,3 +1,9 @@
 EESchema-DOCLIB  Version 2.0
 #
+$CMP MCP1755ST-3302E/DB
+D MCP1755ST, Fixed LDO Voltage Regulator, 3.6V to 16V, 300mV Dropout, 3.3Vout, 300mAout
+K REGULATOR LDO
+F http://www.farnell.com/datasheets/1697992.pdf
+$ENDCMP
+#
 #End Doc Library
