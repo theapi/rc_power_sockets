@@ -3,7 +3,7 @@
   (general
     (links 52)
     (no_connects 0)
-    (area 119.924999 59.924999 170.075001 110.075001)
+    (area 105.214287 58.275 171.875 111.575)
     (thickness 1.6)
     (drawings 41)
     (tracks 213)
@@ -941,13 +941,13 @@
     )
   )
 
-  (module theapi_footprints:SOD-123-Schottky (layer F.Cu) (tedit 56F7E7FA) (tstamp 56F7E8BE)
+  (module theapi_footprints:SOD-123-Schottky (layer F.Cu) (tedit 56F7F1D2) (tstamp 56F7E8BE)
     (at 161 94.6 90)
     (descr SOD-123)
     (tags SOD-123)
     (path /56F14591)
     (attr smd)
-    (fp_text reference D1 (at 0 -2 90) (layer F.SilkS)
+    (fp_text reference D1 (at 3.2 0 180) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value D_Schottky (at 0 2.1 90) (layer F.Fab) hide
@@ -973,13 +973,13 @@
       (net 2 /SCK))
   )
 
-  (module theapi_footprints:SOD-123-Schottky (layer F.Cu) (tedit 56F7E7EE) (tstamp 56F7E8C3)
+  (module theapi_footprints:SOD-123-Schottky (layer F.Cu) (tedit 56F7F1CA) (tstamp 56F7E8C3)
     (at 157 93 90)
     (descr SOD-123)
     (tags SOD-123)
     (path /56F1471B)
     (attr smd)
-    (fp_text reference D2 (at 0 -2 90) (layer F.SilkS)
+    (fp_text reference D2 (at 3.1 0 180) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value D_Schottky (at 0 2.1 90) (layer F.Fab) hide
@@ -1005,13 +1005,13 @@
       (net 3 /MISO))
   )
 
-  (module theapi_footprints:SOD-123-Schottky (layer F.Cu) (tedit 56F7E7E5) (tstamp 56F7E8C8)
+  (module theapi_footprints:SOD-123-Schottky (layer F.Cu) (tedit 56F7F1E9) (tstamp 56F7E8C8)
     (at 137 88.75 90)
     (descr SOD-123)
     (tags SOD-123)
     (path /56F2954C)
     (attr smd)
-    (fp_text reference D3 (at 0 -2 90) (layer F.SilkS)
+    (fp_text reference D3 (at 3.1 0 180) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text value D_Schottky (at 0 2.1 90) (layer F.Fab) hide
