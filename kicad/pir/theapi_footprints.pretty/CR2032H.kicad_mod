@@ -1,4 +1,4 @@
-(module CR2032H (layer F.Cu) (tedit 56F708A7)
+(module CR2032H (layer F.Cu) (tedit 56FBC1F8)
   (fp_text reference REF** (at 0 -12.7) (layer F.SilkS)
     (effects (font (size 1 1) (thickness 0.15)))
   )
@@ -15,6 +15,6 @@
   (fp_line (start 15.875 -3.175) (end 17.145 -3.175) (layer F.SilkS) (width 0.15))
   (fp_line (start 17.145 3.175) (end 10.795 3.175) (layer F.SilkS) (width 0.15))
   (fp_line (start 10.795 -3.175) (end 15.875 -3.175) (layer F.SilkS) (width 0.15))
-  (pad 2 thru_hole circle (at -7.62 0) (size 2.286 2.286) (drill 1.016) (layers *.Cu *.Mask F.SilkS))
+  (pad 2 thru_hole circle (at -5 0) (size 2.286 2.286) (drill 1.016) (layers *.Cu *.Mask F.SilkS))
   (pad 1 thru_hole circle (at 15.24 0) (size 2.286 2.286) (drill 1.016) (layers *.Cu *.Mask F.SilkS))
 )
