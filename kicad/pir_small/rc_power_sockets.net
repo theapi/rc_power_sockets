@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source C:/Users/Peter/repos/rc_power_sockets/kicad/pir_small/rc_power_sockets.sch)
-    (date "02/05/2016 15:19:18")
+    (date "02/05/2016 15:55:44")
     (tool "Eeschema 4.0.1-stable")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -131,7 +131,7 @@
       (tstamp 56F7151A))
     (comp (ref P2)
       (value ALT_PWR)
-      (footprint Socket_Strips:Socket_Strip_Straight_1x02)
+      (footprint Pin_Headers:Pin_Header_Straight_1x02)
       (libsource (lib conn) (part CONN_01X02))
       (sheetpath (names /) (tstamps /))
       (tstamp 56F7F882))
