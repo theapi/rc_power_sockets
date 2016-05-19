@@ -22,10 +22,10 @@
 #endif
 
 //#define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
-const int WD_DO_STUFF = 225; 
+const int WD_DO_STUFF = 110; // ~15 minutes
 
 byte count = 0;
-byte num_transmissions = 5; // How many times to send the command.
+byte num_transmissions = 2; // How many times to send the command.
 byte state = 0; // 0 = off, 1 = on
 
 volatile int wd_isr = WD_DO_STUFF; // Start in do stuff mode.
@@ -86,7 +86,7 @@ void loop() {
         // Rising edge of motion sensor.
         state = 1;
         wd_isr = 0; // Reset the timer
-        for (int i = 0; i <= num_transmissions; i++) {
+        for (int i = 0; i < num_transmissions; i++) {
           mySwitch.switchOn(1, 1);
           // Allow time for transmission
           delay(250);
