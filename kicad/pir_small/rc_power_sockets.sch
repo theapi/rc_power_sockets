@@ -424,8 +424,6 @@ Wire Wire Line
 	9350 4750 8600 4750
 Connection ~ 8600 4750
 Wire Wire Line
-	6700 950  8600 950 
-Wire Wire Line
 	5550 950  5550 1500
 $Comp
 L R R5
@@ -655,6 +653,31 @@ F 1 "PMOS" H 6850 2400 50  0000 R CNN
 F 2 "TO_SOT_Packages_SMD:SOT-23_Handsoldering" H 6650 2550 50  0001 C CNN
 F 3 "" H 6450 2450 50  0000 C CNN
 	1    6450 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C4
+U 1 1 573F0506
+P 7700 1100
+F 0 "C4" H 7725 1200 50  0000 L CNN
+F 1 "10uF" H 7725 1000 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 7738 950 50  0001 C CNN
+F 3 "" H 7700 1100 50  0000 C CNN
+	1    7700 1100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6700 950  8600 950 
+Connection ~ 7700 950 
+$Comp
+L GND #PWR015
+U 1 1 573F0819
+P 7700 1250
+F 0 "#PWR015" H 7700 1000 50  0001 C CNN
+F 1 "GND" H 7700 1100 50  0000 C CNN
+F 2 "" H 7700 1250 50  0000 C CNN
+F 3 "" H 7700 1250 50  0000 C CNN
+	1    7700 1250
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
