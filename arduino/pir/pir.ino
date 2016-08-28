@@ -1,4 +1,10 @@
 
+/**
+ * Use Attiny85 core from here:
+ * https://github.com/SpenceKonde/ATTinyCore
+ * 
+ */
+
 #if defined( __AVR_ATtiny85__ )
   #define __AVR_ATtinyX5__ 1 // For RCSwitch
 #endif
