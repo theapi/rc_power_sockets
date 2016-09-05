@@ -3,6 +3,9 @@
  * Use Attiny85 core from here:
  * https://github.com/SpenceKonde/ATTinyCore
  * 
+ * Install with the boards manager:
+ * http://drazzy.com/package_drazzy.com_index.json
+ *
  */
 
 #if defined( __AVR_ATtiny85__ )
@@ -21,14 +24,17 @@
   #define PIN_POWER 1
   #define PIN_RADIO_OUT 4
   #define PIN_DEBUG 0
+  #define PIN_STATUS 3 // Not using it as an analog input
 #else
   #define PIN_POWER 6
   #define PIN_RADIO_OUT 7
   #define PIN_DEBUG 1
+  #define PIN_STATUS 3
 #endif
 
 //#define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
-const int WD_DO_STUFF = 110; // ~15 minutes
+//const int WD_DO_STUFF = 110; // ~15 minutes
+const int WD_DO_STUFF = 4; // ~30
 
 byte count = 0;
 byte num_transmissions = 2; // How many times to send the command.
@@ -65,6 +71,7 @@ void setup() {
   pinMode(PIN_MOTION_IN, INPUT);
   pinMode(PIN_POWER, OUTPUT);
   pinMode(PIN_DEBUG, OUTPUT);
+  pinMode(PIN_STATUS, OUTPUT);
   
   // Keep the power on.
   digitalWrite(PIN_POWER, HIGH);
@@ -81,7 +88,7 @@ void setup() {
 void loop() {
   // Tell watchdog all is ok.
   wdt_reset();
-  
+
   if (wd_isr < WD_DO_STUFF) {
     // Carry on sleeping.
     goToSleep();
@@ -89,9 +96,19 @@ void loop() {
     if (digitalRead(PIN_MOTION_IN)) {
       // Movement happening.
       if (state == 0) {
-        // Rising edge of motion sensor.
+        // "Rising edge" of motion sensor.
         state = 1;
+
+        // For when powered by mains & the actual power does not get disconnected.
+        // due to a bunch of hardware, mosfets etc not being installed.
+        // but good to still have a power status indicator.
+        digitalWrite(PIN_POWER, HIGH);
+
         wd_isr = 0; // Reset the timer
+
+        // Turn on the indicator leds
+        digitalWrite(PIN_STATUS, HIGH);
+
         for (int i = 0; i < num_transmissions; i++) {
           mySwitch.switchOn(1, 1);
           // Allow time for transmission
@@ -101,8 +118,12 @@ void loop() {
     } else {
       // No movement.
       if (state == 1) {
-        // Falling edge of motion sensor.
+        // "Falling edge" of motion sensor.
         state = 0;
+
+        // Turn off the indicator leds
+        digitalWrite(PIN_STATUS, LOW);
+
         for (int i = 0; i <= num_transmissions; i++) {
           mySwitch.switchOff(1, 1);
           // Allow time for transmission
