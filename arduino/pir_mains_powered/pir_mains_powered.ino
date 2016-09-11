@@ -73,12 +73,13 @@ void setup() {
   //power_timer2_enable();
   
   pinMode(PIN_MOTION_IN, INPUT);
-  pinMode(PIN_POWER, OUTPUT);
+  
   pinMode(PIN_DEBUG, OUTPUT);
   pinMode(PIN_STATUS, OUTPUT);
-  
-  // Keep the power on.
-  digitalWrite(PIN_POWER, HIGH);
+
+  // No power switch in this configuration
+  pinMode(PIN_POWER, INPUT);
+ 
   
   digitalWrite(PIN_DEBUG, HIGH);
 
@@ -100,10 +101,7 @@ void loop() {
       // so change state and turn stuff on.
       state = 1;
 
-      // For when powered by mains & the actual power does not get disconnected.
-      // due to a bunch of hardware, mosfets etc not being installed.
-      // but good to still have a power status indicator.
-      digitalWrite(PIN_POWER, HIGH);
+     
 
       wd_isr = 0; // Reset the timer
 
@@ -113,12 +111,10 @@ void loop() {
       for (int i = 0; i < num_transmissions; i++) {
         mySwitch.switchOn(CODE_NUMBER, CHANNEL_NUMBER);
         // Allow time for transmission
-        delay(250);
+        delay(1000);
       }
     }
-  }
-
-  if (wd_isr < WD_DO_STUFF) {
+  } else if (wd_isr < WD_DO_STUFF) {
     // Carry on sleeping.
     goToSleep();
   } else {
@@ -135,14 +131,11 @@ void loop() {
         for (int i = 0; i <= num_transmissions; i++) {
           mySwitch.switchOff(CODE_NUMBER, CHANNEL_NUMBER);
           // Allow time for transmission
-          delay(250);
+          delay(2000);
         }
       }
-      // power down 
-      digitalWrite(PIN_POWER, LOW);
+   
     }
-    
-    goToSleep();
   }
 
 }
