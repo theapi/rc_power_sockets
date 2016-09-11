@@ -9,8 +9,8 @@
  */
 
 
-#define DIAL_TOP 1
-#define DIAL_BOTTOM 2
+#define CODE_NUMBER 1   // top dial
+#define CHANNEL_NUMBER 2 // bottom dial
 
 #if defined( __AVR_ATtiny85__ )
   #define __AVR_ATtinyX5__ 1 // For RCSwitch
@@ -37,8 +37,8 @@
 #endif
 
 //#define WD_DO_STUFF 225 // How many watchdog interupts before doing real work: 225 * 8 / 60 = 30 minutes.
-const int WD_DO_STUFF = 110; // ~15 minutes
-//const int WD_DO_STUFF = 4; // ~30
+//const int WD_DO_STUFF = 110; // ~15 minutes
+const int WD_DO_STUFF = 3; // ~24 seconds
 
 byte count = 0;
 byte num_transmissions = 2; // How many times to send the command.
@@ -93,43 +93,47 @@ void loop() {
   // Tell watchdog all is ok.
   wdt_reset();
 
+  if (digitalRead(PIN_MOTION_IN)) {
+    // Movement happening.
+    if (state == 0) {
+      // Previously there was no movement,
+      // so change state and turn stuff on.
+      state = 1;
+
+      // For when powered by mains & the actual power does not get disconnected.
+      // due to a bunch of hardware, mosfets etc not being installed.
+      // but good to still have a power status indicator.
+      digitalWrite(PIN_POWER, HIGH);
+
+      wd_isr = 0; // Reset the timer
+
+      // Turn on the indicator leds
+      digitalWrite(PIN_STATUS, HIGH);
+
+      for (int i = 0; i < num_transmissions; i++) {
+        mySwitch.switchOn(CODE_NUMBER, CHANNEL_NUMBER);
+        // Allow time for transmission
+        delay(250);
+      }
+    }
+  }
+
   if (wd_isr < WD_DO_STUFF) {
     // Carry on sleeping.
     goToSleep();
   } else {
-    if (digitalRead(PIN_MOTION_IN)) {
-      // Movement happening.
-      if (state == 0) {
-        // "Rising edge" of motion sensor.
-        state = 1;
-
-        // For when powered by mains & the actual power does not get disconnected.
-        // due to a bunch of hardware, mosfets etc not being installed.
-        // but good to still have a power status indicator.
-        digitalWrite(PIN_POWER, HIGH);
-
-        wd_isr = 0; // Reset the timer
-
-        // Turn on the indicator leds
-        digitalWrite(PIN_STATUS, HIGH);
-
-        for (int i = 0; i < num_transmissions; i++) {
-          mySwitch.switchOn(DIAL_TOP, DIAL_BOTTOM);
-          // Allow time for transmission
-          delay(250);
-        }
-      }
-    } else {
+   if (!digitalRead(PIN_MOTION_IN)) {
       // No movement.
       if (state == 1) {
-        // "Falling edge" of motion sensor.
+        // Previously there was movement,
+        // so change state and turn stuff off.
         state = 0;
 
         // Turn off the indicator leds
         digitalWrite(PIN_STATUS, LOW);
 
         for (int i = 0; i <= num_transmissions; i++) {
-          mySwitch.switchOff(DIAL_TOP, DIAL_BOTTOM);
+          mySwitch.switchOff(CODE_NUMBER, CHANNEL_NUMBER);
           // Allow time for transmission
           delay(250);
         }
