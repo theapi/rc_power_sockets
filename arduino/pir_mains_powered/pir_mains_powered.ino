@@ -92,7 +92,7 @@ void loop() {
       for (int i = 0; i < num_transmissions; i++) {
         mySwitch.switchOn(CODE_NUMBER, CHANNEL_NUMBER);
         // Allow time for transmission
-        delay(2000);
+        delay(250);
       }
     }
   } else {
@@ -110,10 +110,10 @@ void loop() {
         // Turn off the indicator leds
         digitalWrite(PIN_STATUS, LOW);
   
-        for (int i = 0; i <= num_transmissions; i++) {
+        for (int i = 0; i < num_transmissions; i++) {
           mySwitch.switchOff(CODE_NUMBER, CHANNEL_NUMBER);
-          // Allow time for transmission & motion going high on transmission
-          delay(4000);
+          // Allow time for transmission
+          delay(250);
         }
       }
     }
